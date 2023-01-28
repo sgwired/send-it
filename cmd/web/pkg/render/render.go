@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"trinity.jakks.net/Administrator/send-it/cmd/web/config"
+	"trinity.jakks.net/Administrator/send-it/cmd/web/pkg/models"
 )
 
 var app *config.AppConfig
@@ -17,8 +18,13 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+// AddDefaultData allows way to add data for every template
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+	return td
+}
 
-func RenderTemplate(w http.ResponseWriter, tmpl string) {
+
+func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		// get the template cache from app config
@@ -37,7 +43,9 @@ func RenderTemplate(w http.ResponseWriter, tmpl string) {
 	// sanity check before returning template
 	buf := new(bytes.Buffer)
 
-	err := t.Execute(buf, nil)
+	td = AddDefaultData(td)
+
+	err := t.Execute(buf, td)
 	if err != nil {
 		log.Println(err)
 	}
