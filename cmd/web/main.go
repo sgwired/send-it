@@ -27,9 +27,13 @@ func main() {
 
 	render.NewTemplates(&app)
 
-	http.HandleFunc("/", handlers.Repo.Home)
-	http.HandleFunc("/about", handlers.Repo.About)
+	srv := &http.Server {
+		Addr: portNumber,
+		Handler: routes(&app),
+	}
 
-	http.ListenAndServe(portNumber, nil)
-
+	err = srv.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
